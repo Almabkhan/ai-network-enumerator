@@ -1,0 +1,34 @@
+name: Simple Test
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Check files
+      run: |
+        ls -la
+        python --version
+    
+    - name: Test import
+      run: |
+        python -c "from network_scanner import NetworkScanner; print('✅ Import successful')"
+    
+    - name: Test basic functionality
+      run: |
+        python -c "
+from network_scanner import NetworkScanner
+scanner = NetworkScanner('127.0.0.1')
+print(f'✅ Scanner created for {scanner.target}')
+print(f'✅ Port 22 service: {scanner.get_service_name(22)}')
+"
