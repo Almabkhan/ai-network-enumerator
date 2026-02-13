@@ -1,0 +1,59 @@
+name: Real Tests
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Check file exists
+      run: |
+        echo "✅ Checking if network_scanner.py exists..."
+        if [ -f "network_scanner.py" ]; then
+          echo "✅ network_scanner.py found"
+        else
+          echo "❌ network_scanner.py not found"
+          exit 1
+        fi
+    
+    - name: Test import
+      run: |
+        echo "✅ Testing import..."
+        python -c "
+import sys
+print(f'Python version: {sys.version}')
+try:
+    from network_scanner import NetworkScanner
+    print('✅ Import successful!')
+    print('✅ Class NetworkScanner found')
+    scanner = NetworkScanner('127.0.0.1')
+    print('✅ Object created successfully')
+    print('✅ Test passed!')
+except Exception as e:
+    print(f'❌ Error: {e}')
+    sys.exit(1)
+"
+    
+    - name: Test get_service_name method
+      run: |
+        echo "✅ Testing get_service_name method..."
+        python -c "
+from network_scanner import NetworkScanner
+scanner = NetworkScanner('127.0.0.1')
+assert scanner.get_service_name(22) == 'SSH'
+assert scanner.get_service_name(80) == 'HTTP'
+assert scanner.get_service_name(443) == 'HTTPS'
+print('✅ Service name test passed!')
+"
+    
+    - name: All tests passed
+      run: echo "✅ All real tests passed! Professional green tick earned!"
